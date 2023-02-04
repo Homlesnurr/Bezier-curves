@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.collections import LineCollection
 
 class point():
     def __init__(self, x, y, father = None, depth = 0):
@@ -10,7 +11,8 @@ class point():
         self.depth = depth + 1
         
         
-    def movePoint(self, dt):             
+    def movePoint(self, dt):   
+        self.t += dt          
         self.x = (1 - self.t) * self.father.startPoint.x + self.t * self.father.endPoint.x
         self.y = (1 - self.t) * self.father.startPoint.y + self.t * self.father.endPoint.y
         
@@ -29,7 +31,7 @@ class vector():
         self.depth = depth + 1
         
     def __repr__(self):
-        return f"({self.x},{self.y}) -> ({self.endx},{self.endy})"
+        return f"({self.startPoint.x},{self.startPoint.y}) -> ({self.endPoint.x},{self.endPoint.y})"
     
 
 
@@ -41,7 +43,7 @@ def bezier(allPoints):
     xvalues = []
     yvalues = []
     
-    dt = 0.001
+    dt = 0.01
     t = int(1/dt)
     
     for i in range(len(allPoints) - 2):
@@ -51,16 +53,49 @@ def bezier(allPoints):
             nextSetOfPoints.append(pOV)
         
         vectors.append(getVectors(nextSetOfPoints))
+
+    plt.ion()
+    
+    fig, ax = plt.subplots(1, 1, figsize=(10, 10))
     
     for i in range(t):
+        ax.cla()
+
+        scatterX = []
+        scatterY = []
+
+        linesegments = []
+            
+        for vlist in vectors:
+            for v in vlist:
+                scatterX.append(v.startPoint.x)
+                scatterY.append(v.startPoint.y)
+                scatterX.append(v.endPoint.x)
+                scatterY.append(v.endPoint.y)
+                linesegments.append([(v.startPoint.x, v.startPoint.y), (v.endPoint.x, v.endPoint.y)])
+        
+        ax.scatter(scatterX, scatterY)
+        ls = LineCollection(linesegments, linewidths=1)
+        ax.add_collection(ls)
+        
+        fig.canvas.draw()
+        fig.canvas.flush_events()
+
+        moved = []
+
         for i in range(1, len(vectors)):
+
             if len(vectors[i]) == 1:
                 xvalues.append(vectors[i][0].startPoint.x)
                 yvalues.append(vectors[i][0].startPoint.y)
-            else:
-                for v in vectors[i]:
+
+            for v in vectors[i]:
+                if v.startPoint not in moved:
                     v.startPoint.movePoint(dt)
+                    moved.append(v.startPoint)
+                if v.endPoint not in moved:
                     v.endPoint.movePoint(dt)
+                    moved.append(v.endPoint)
                 
     
     return xvalues, yvalues
@@ -86,12 +121,12 @@ midPoints = allPoints[1:-1]
 
 curve = bezier(allPoints)
 
-xvalues = []
-yvalues = []
+# xvalues = []
+# yvalues = []
 
-for p in allPoints:
-    xvalues.append(p.x)
-    yvalues.append(p.y)
+# for p in allPoints:
+#     xvalues.append(p.x)
+#     yvalues.append(p.y)
 
-plt.plot(xvalues, yvalues)
-plt.show()
+# plt.plot(xvalues, yvalues)
+# plt.show()
