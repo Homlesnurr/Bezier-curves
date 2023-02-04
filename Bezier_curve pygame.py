@@ -6,9 +6,7 @@ import pygame
 
 pygame.init()
 
-size = width, height = 700, 700
 
-screen = pygame.display.set_mode(size)
 
 class point():
     def __init__(self, x, y, father = None, depth = 0):
@@ -114,7 +112,7 @@ def bezier(allPoints):
         xvalues.append(finalPoint.x)
         yvalues.append(finalPoint.y)    
         
-        pygame.draw.lines(screen, color=(255,0,0), closed=False, points=[(xvalues[-2], yvalues[-2]),(xvalues[-1], yvalues[-1])], width=3)
+        pygame.draw.lines(screen, color=(255,0,0), closed=False, points=[(xvalues[-2], (size[1] - yvalues[-2]) ),(xvalues[-1], (size[1] - yvalues[-1]))], width=3)
         pygame.display.update()
         pygame.time.delay(10)
     # while plt.get_fignums():
@@ -137,6 +135,10 @@ allPoints = [
     point(200,500),
     point(500,2)
 ]
+
+size = width, height = 700, 700
+
+screen = pygame.display.set_mode(size)
 
 midPoints = allPoints[1:-1]
 
