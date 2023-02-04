@@ -40,8 +40,10 @@ def bezier(allPoints):
     vectors = []
     vectors.append(getVectors(allPoints))
     
-    xvalues = []
-    yvalues = []
+    show = True
+    
+    xvalues = [allPoints[0].x]
+    yvalues = [allPoints[0].y]
     
     dt = 0.01
     t = int(1/dt)
@@ -54,41 +56,47 @@ def bezier(allPoints):
         
         vectors.append(getVectors(nextSetOfPoints))
 
+    finalPoint = point(vectors[-1][0].startX, vectors[-1][0].startY, vectors[-1][0], vectors[-1][0].depth)
+    
     plt.ion()
     
     fig, ax = plt.subplots(1, 1, figsize=(10, 10))
     
-    for i in range(t):
+    for i in range(t+1):
         ax.cla()
 
         scatterX = []
         scatterY = []
-
+        colors = []
         linesegments = []
-            
+        
         for vlist in vectors:
             for v in vlist:
                 scatterX.append(v.startPoint.x)
                 scatterY.append(v.startPoint.y)
+                colors.append('blue')
                 scatterX.append(v.endPoint.x)
                 scatterY.append(v.endPoint.y)
+                colors.append('blue')
                 linesegments.append([(v.startPoint.x, v.startPoint.y), (v.endPoint.x, v.endPoint.y)])
         
-        ax.scatter(scatterX, scatterY)
-        ls = LineCollection(linesegments, linewidths=1)
-        ax.add_collection(ls)
         
+            
+        scatterX.append(finalPoint.x)
+        scatterY.append(finalPoint.y)
+        colors.append('red')
+        ax.scatter(scatterX, scatterY, c=colors)
+        ls = LineCollection(linesegments, linewidths=1, colors='gray')
+        ax.add_collection(ls)
+        ax.plot(xvalues, yvalues, lw = 3, c='green')
         fig.canvas.draw()
         fig.canvas.flush_events()
+
+        
 
         moved = []
 
         for i in range(1, len(vectors)):
-
-            if len(vectors[i]) == 1:
-                xvalues.append(vectors[i][0].startPoint.x)
-                yvalues.append(vectors[i][0].startPoint.y)
-
             for v in vectors[i]:
                 if v.startPoint not in moved:
                     v.startPoint.movePoint(dt)
@@ -96,11 +104,17 @@ def bezier(allPoints):
                 if v.endPoint not in moved:
                     v.endPoint.movePoint(dt)
                     moved.append(v.endPoint)
-                
+        finalPoint.movePoint(dt)
+        xvalues.append(finalPoint.x)
+        yvalues.append(finalPoint.y)    
+    
+    while plt.get_fignums():
+        fig.canvas.draw()
+        fig.canvas.flush_events()
     
     return xvalues, yvalues
 
-def getVectors(points):
+def getVectors(points): 
     output = []
     
     for i,p in enumerate(points[:-1]):
@@ -108,25 +122,18 @@ def getVectors(points):
     
     return output
 
-startPoint = point(0,0)
-endPoint = point(5,2)
 
-startEnd = [startPoint,endPoint]
 
-midPoint1 = point(1,2)
-midPoint2 = point(2,0)
+allPoints = [
+    point(0,0),
+    point(1,3),
+    point(2,1),
+    point(0,3)
+]
 
-allPoints = [startPoint,midPoint1,midPoint2,endPoint]
 midPoints = allPoints[1:-1]
 
 curve = bezier(allPoints)
 
-# xvalues = []
-# yvalues = []
-
-# for p in allPoints:
-#     xvalues.append(p.x)
-#     yvalues.append(p.y)
-
-# plt.plot(xvalues, yvalues)
+# plt.plot(curve[0],curve[1])
 # plt.show()
