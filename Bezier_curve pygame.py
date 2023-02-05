@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-from matplotlib.collections import LineCollection
 import pygame
 
 
@@ -33,6 +32,9 @@ class vector():
         
         self.startX = startPoint.x
         self.startY = startPoint.y
+        self.endX = endPoint.x
+        self.endY = endPoint.y
+        
         
         self.depth = depth + 1
         
@@ -48,8 +50,10 @@ def bezier(allPoints):
     
     xvalues = [allPoints[0].x]
     yvalues = [allPoints[0].y]
+ 
+    line = []
     
-    dt = 0.01
+    dt = 0.001
     t = int(1/dt)
     
     for i in range(len(allPoints) - 2):
@@ -62,41 +66,9 @@ def bezier(allPoints):
 
     finalPoint = point(vectors[-1][0].startX, vectors[-1][0].startY, vectors[-1][0], vectors[-1][0].depth)
     
-    # plt.ion()
-    
-    # fig, ax = plt.subplots(1, 1, figsize=(10, 10))
-    
-    for i in range(t+1):
-        # ax.cla()
-
-        # scatterX = []
-        # scatterY = []
-        # colors = []
-        # linesegments = []
-        
-        # for vlist in vectors:
-        #     for v in vlist:
-        #         scatterX.append(v.startPoint.x)
-        #         scatterY.append(v.startPoint.y)
-        #         colors.append('blue')
-        #         scatterX.append(v.endPoint.x)
-        #         scatterY.append(v.endPoint.y)
-        #         colors.append('blue')
-        #         linesegments.append([(v.startPoint.x, v.startPoint.y), (v.endPoint.x, v.endPoint.y)])
-        
-        
-            
-        # scatterX.append(finalPoint.x)
-        # scatterY.append(finalPoint.y)
-        # colors.append('red')
-        # ax.scatter(scatterX, scatterY, c=colors)
-        # ls = LineCollection(linesegments, linewidths=1, colors='gray')
-        # ax.add_collection(ls)
-        # ax.plot(xvalues, yvalues, lw = 3, c='green')
-        # fig.canvas.draw()
-        # fig.canvas.flush_events()
-
-        
+ 
+    for i in range(t):
+ 
 
         moved = []
 
@@ -112,12 +84,28 @@ def bezier(allPoints):
         xvalues.append(finalPoint.x)
         yvalues.append(finalPoint.y)    
         
-        pygame.draw.lines(screen, color=(255,0,0), closed=False, points=[(xvalues[-2], (size[1] - yvalues[-2]) ),(xvalues[-1], (size[1] - yvalues[-1]))], width=3)
+        # Draws all vectors
+        for i in range(len(moved) - 1):
+            pygame.draw.lines(screen, color=(33,33,33), closed=False, points=[(moved[i].x, (size[1] - moved[i].y)), (moved[i+1].x, (size[1] - moved[i+1].y))], width=1)
+            pygame.draw.circle(screen, color=(0,0,0), center=(moved[i].x, (size[1] - moved[i].y)), radius=3, width=5)
+            pygame.draw.circle(screen, color=(0,0,0), center=(moved[i+1].x, (size[1] - moved[i+1].y)), radius=3, width=5)
+        
+        for n in range(len(vectors)):
+            for v in vectors[n]:
+                pygame.draw.lines(screen, color=(0,0,0), closed=False, points=[(v.startX, (size[1] - v.startY)), (v.endX, (size[1] - v.endY))], width=3)
+        # Draws all points        
+        for p in allPoints:
+            pygame.draw.circle(screen, color=(0,0,0), center=(p.x, (size[1] - p.y)), radius=5, width=5)
+            
+        
+        # Makes a list of the bezier curve so it can be drawn every time
+        line.append([(xvalues[-2], (size[1] - yvalues[-2]) ),(xvalues[-1], (size[1] - yvalues[-1]))])
+        for i in line:
+            pygame.draw.lines(screen, color=(255,0,0), closed=False, points=i, width=3)
+        pygame.draw.circle(screen, color=(255,0,0), center=(xvalues[-1], (size[1] - yvalues[-1])), radius=3, width=3)
         pygame.display.update()
-        pygame.time.delay(10)
-    # while plt.get_fignums():
-    #     fig.canvas.draw()
-    #     fig.canvas.flush_events()
+        pygame.time.delay(2)
+        screen.fill((255,255,255))
     
     return xvalues, yvalues
 
@@ -129,17 +117,14 @@ def getVectors(points):
     
     return output
 
-allPoints = [
-    point(20,20),
-    point(500,10),
-    point(200,500),
-    point(500,2)
-]
+allPoints = []
 
 size = width, height = 700, 700
 
 screen = pygame.display.set_mode(size)
 
+screen.fill((255,255,255))
+pygame.display.update()
 midPoints = allPoints[1:-1]
 
 
@@ -150,8 +135,26 @@ midPoints = allPoints[1:-1]
 #             quit()
 
     
+while True:
+    for events in pygame.event.get():
+        if events.type == pygame.MOUSEBUTTONDOWN:
+            allPoints.append(point(pygame.mouse.get_pos()[0], size[1] - pygame.mouse.get_pos()[1]))
+            for p in allPoints:
+                pygame.draw.circle(screen, color=(0,0,0), center=(p.x, (size[1] - p.y)), radius=5, width=5)
+            pygame.display.update() 
+        
+        if events.type == pygame.KEYDOWN:
+            if events.key == pygame.K_RETURN:
+                bezier(allPoints)
 
-curve = bezier(allPoints)
+            if events.key == pygame.K_ESCAPE:
+                allPoints = []
+                screen.fill((255,255,255))
+                pygame.display.update()
+        
+        if events.type == pygame.QUIT:
+            pygame.quit()
+            quit()
 
 # while True:
 #     for events in pygame.event.get():
@@ -164,7 +167,7 @@ curve = bezier(allPoints)
 # for i in range(len(curve[0])):    
 #     pygame.draw.circle(screen, color=(255,0,0), center=(curve[0][i], curve[1][i]), radius=4, width=1)
 
-for p in allPoints:
-    plt.plot(p.x, p.y, 'o')
-plt.plot(curve[0],curve[1])
-plt.show()
+# for p in allPoints:
+#     plt.plot(p.x, p.y, 'o')
+# plt.plot(curve[0],curve[1])
+# plt.show()
