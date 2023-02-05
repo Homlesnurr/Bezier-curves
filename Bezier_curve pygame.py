@@ -86,26 +86,26 @@ def bezier(allPoints):
         
         # Draws all vectors
         for i in range(len(moved) - 1):
-            pygame.draw.lines(screen, color=(33,33,33), closed=False, points=[(moved[i].x, (size[1] - moved[i].y)), (moved[i+1].x, (size[1] - moved[i+1].y))], width=1)
-            pygame.draw.circle(screen, color=(0,0,0), center=(moved[i].x, (size[1] - moved[i].y)), radius=3, width=5)
-            pygame.draw.circle(screen, color=(0,0,0), center=(moved[i+1].x, (size[1] - moved[i+1].y)), radius=3, width=5)
+            pygame.draw.lines(screen, color=(46, 46, 46), closed=False, points=[(moved[i].x, (size[1] - moved[i].y)), (moved[i+1].x, (size[1] - moved[i+1].y))], width=1)
+            pygame.draw.circle(screen, color=(35, 35, 35), center=(moved[i].x, (size[1] - moved[i].y)), radius=3, width=5)
+            pygame.draw.circle(screen, color=(35, 35, 35), center=(moved[i+1].x, (size[1] - moved[i+1].y)), radius=3, width=5)
         
         for n in range(len(vectors)):
             for v in vectors[n]:
-                pygame.draw.lines(screen, color=(0,0,0), closed=False, points=[(v.startX, (size[1] - v.startY)), (v.endX, (size[1] - v.endY))], width=3)
+                pygame.draw.lines(screen, color=(35, 35, 35), closed=False, points=[(v.startX, (size[1] - v.startY)), (v.endX, (size[1] - v.endY))], width=3)
         # Draws all points        
         for p in allPoints:
-            pygame.draw.circle(screen, color=(0,0,0), center=(p.x, (size[1] - p.y)), radius=5, width=5)
+            pygame.draw.circle(screen, color=(35, 35, 35), center=(p.x, (size[1] - p.y)), radius=5, width=5)
             
         
         # Makes a list of the bezier curve so it can be drawn every time
         line.append([(xvalues[-2], (size[1] - yvalues[-2]) ),(xvalues[-1], (size[1] - yvalues[-1]))])
         for i in line:
-            pygame.draw.lines(screen, color=(255,0,0), closed=False, points=i, width=3)
-        pygame.draw.circle(screen, color=(255,0,0), center=(xvalues[-1], (size[1] - yvalues[-1])), radius=3, width=3)
+            pygame.draw.lines(screen, color=(237,35,0), closed=False, points=i, width=3)
+        pygame.draw.circle(screen, color=(237,35,0), center=(xvalues[-1], (size[1] - yvalues[-1])), radius=3, width=3)
         pygame.display.update()
         pygame.time.delay(2)
-        screen.fill((255,255,255))
+        screen.fill((12, 12, 12))
     
     return xvalues, yvalues
 
@@ -123,16 +123,9 @@ size = width, height = 700, 700
 
 screen = pygame.display.set_mode(size)
 
-screen.fill((255,255,255))
+screen.fill((12, 12, 12))
 pygame.display.update()
 midPoints = allPoints[1:-1]
-
-
-# while True:
-#     for events in pygame.event.get():
-#         if events.type == pygame.QUIT:
-#             pygame.quit()
-#             quit()
 
     
 while True:
@@ -140,7 +133,7 @@ while True:
         if events.type == pygame.MOUSEBUTTONDOWN:
             allPoints.append(point(pygame.mouse.get_pos()[0], size[1] - pygame.mouse.get_pos()[1]))
             for p in allPoints:
-                pygame.draw.circle(screen, color=(0,0,0), center=(p.x, (size[1] - p.y)), radius=5, width=5)
+                pygame.draw.circle(screen, color=(35, 35, 35), center=(p.x, (size[1] - p.y)), radius=5, width=5)
             pygame.display.update() 
         
         if events.type == pygame.KEYDOWN:
@@ -149,25 +142,9 @@ while True:
 
             if events.key == pygame.K_ESCAPE:
                 allPoints = []
-                screen.fill((255,255,255))
+                screen.fill((12, 12, 12))
                 pygame.display.update()
         
         if events.type == pygame.QUIT:
             pygame.quit()
             quit()
-
-# while True:
-#     for events in pygame.event.get():
-#         if events.type == pygame.QUIT:
-#             pygame.quit()
-#             quit()
-
-#     pygame.display.update()
-
-# for i in range(len(curve[0])):    
-#     pygame.draw.circle(screen, color=(255,0,0), center=(curve[0][i], curve[1][i]), radius=4, width=1)
-
-# for p in allPoints:
-#     plt.plot(p.x, p.y, 'o')
-# plt.plot(curve[0],curve[1])
-# plt.show()
